@@ -81,6 +81,26 @@ int main() {
     else if (strcmp(action, "REMOVE") == 0) {
       cout << "What would you like to remove? (VERTEX, EDGE) "; cin >> action;
       if (strcmp(action, "VERTEX") == 0) {
+	node* removal = NULL;
+	int index;
+	cout << "Enter the vertex to delete: "; cin >> newlabel;
+	for (int i=0; i<nodes.size(); i++) {
+	  if (strcmp(nodes[i]->label,newlabel) == 0) {
+	    removal = nodes[i];
+	    index = i;
+	  }
+	}
+	for (int i=0; i<nodes.size(); i++) {
+	  if (check_connection(nodes[i],removal) == true) {
+	    for (int j=0; j<nodes[i]->edges.size(); j++) {
+	      if (nodes[i]->edges[j]->end == removal) {
+		nodes[i]->edges.erase(nodes[i]->edges.begin()+i);
+		break;
+	      }
+	    }
+	  }
+	}
+	nodes.erase(nodes.begin()+index);
       }
       else if (strcmp(action, "EDGE") == 0) {
 	node* start = NULL;
