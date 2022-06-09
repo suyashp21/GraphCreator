@@ -80,6 +80,52 @@ int main() {
     }
     else if (strcmp(action, "REMOVE") == 0) {
       cout << "What would you like to remove? (VERTEX, EDGE) "; cin >> action;
+      if (strcmp(action, "VERTEX") == 0) {
+      }
+      else if (strcmp(action, "EDGE") == 0) {
+	node* start = NULL;
+	node* end = NULL;
+        while (true) {
+          cout << "Enter the starting node of the edge to delete: "; cin >> newlabel;
+          for (int i=0; i<nodes.size(); i++) {
+            if (strcmp(nodes[i]->label,newlabel) == 0) {
+              start = nodes[i];
+            }
+          }
+          if (start == NULL) {
+            cout << "No node has that label." << endl;
+          }
+          else {
+            break;
+          }
+        }
+        while (true) {
+          cout << "Enter the end node if tge edge to delete: "; cin >> newlabel;
+          for (int i=0; i<nodes.size(); i++) {
+            if (strcmp(nodes[i]->label,newlabel) == 0) {
+              end = nodes[i];
+            }
+          }
+          if (end == NULL) {
+            cout << "No node has that label." << endl;
+          }
+          else {
+            break;
+          }
+        }
+	if (check_connection(start, end) == false) {
+	  cout << "There's no connection between those vertices." << endl;
+	}
+	else {
+	  for (int i=0; i<start->edges.size(); i++) {
+	    if (start->edges[i]->end == end) {
+	      start->edges.erase(start->edges.begin()+i);
+	      break;
+	    }
+	  }
+	}
+
+      }
     }
     else if (strcmp(action, "PRINT") == 0) {
       // print the adjacency matrix (for debugging purposes)
