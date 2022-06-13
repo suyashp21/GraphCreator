@@ -22,10 +22,20 @@ struct edge {
   int weight;
 };
 
+struct storage {
+  // for Dijkstra's Shortest path algorithm
+  int shortest;
+  node* n;
+  node* previous;
+  bool visited;
+};
+
 bool check_connection(node* n1, node* n2);
+int find_path(node* start, node* end, vector <node*> nodes, vector<node*> path);
 
 int main() {
   vector <node*> nodes;
+  vector <node*> path;
   char action[20];
   char newlabel[20];
   int newweight;
@@ -34,6 +44,7 @@ int main() {
     if (strcmp(action, "ADD") == 0) {
       cout << "What would you like to add? (VERTEX, EDGE) "; cin >> action;
       if (strcmp(action, "VERTEX") == 0) {
+	// adds a node to the graph
 	cout << "Enter the label for the new vertex: "; cin >> newlabel;
 	node* n = new node();
 	strcpy(n->label, newlabel);
@@ -43,6 +54,7 @@ int main() {
 	node* start = NULL;
 	node* end = NULL;
 	while (true) {
+	  // ask for nodes at start and end of edge
 	  cout << "Enter the starting node: "; cin >> newlabel;
 	  for (int i=0; i<nodes.size(); i++) {
 	    if (strcmp(nodes[i]->label,newlabel) == 0) {
@@ -120,7 +132,7 @@ int main() {
           }
         }
         while (true) {
-          cout << "Enter the end node if tge edge to delete: "; cin >> newlabel;
+          cout << "Enter the end node if the edge to delete: "; cin >> newlabel;
           for (int i=0; i<nodes.size(); i++) {
             if (strcmp(nodes[i]->label,newlabel) == 0) {
               end = nodes[i];
@@ -167,10 +179,52 @@ int main() {
       }
     }
     else if (strcmp(action, "PATH") == 0) {
+      // find length of shortest path between two specified nodes
+      node* start = NULL;
+      node* end = NULL;
+      while (true) {
+        cout << "Enter the starting node: "; cin >> newlabel;
+        for (int i=0; i<nodes.size(); i++) {
+          if (strcmp(nodes[i]->label,newlabel) == 0) {
+            start = nodes[i];
+          }
+        }
+        if (start == NULL) {
+          cout << "No node has that label." << endl;
+        }
+        else {
+          break;
+        }
+      }
+      while (true) {
+        cout << "Enter the end node: "; cin >> newlabel;
+        for (int i=0; i<nodes.size(); i++) {
+          if (strcmp(nodes[i]->label,newlabel) == 0) {
+            end = nodes[i];
+          }
+        }
+        if (end == NULL) {
+          cout << "No node has that label." << endl;
+        }
+        else {
+          break;
+        }
+      }
+      int result = find_path(start, end, nodes, path);
+      if (result < 0 || result > 1000000) {
+	cout << "No path exists." << result;
+      }
+      else {
+	// length of shortest path (but not the actual path, unfortunately)
+	cout << "There is a path. The shortest possible is " << result << "." << endl;
+      }
+
     }
     else if (strcmp(action, "QUIT") == 0) {
+      // end loop
       break;
     }
+    cout << endl;
   }
   return 0;
 }
@@ -183,4 +237,29 @@ bool check_connection(node* n1, node* n2) {
     }
   }
   return false;
+}
+
+int find_path(node* start, node* end, vector <node*> nodes, vector<node*> path) {
+  // recursively finds the length of the shortest path between two nodes of it exists (or returns some really large number if it doesn't
+  if (start == end) {
+    return 0;
+  }
+  path.push_back(start);
+  int minimum = 10000000;
+  for (int i = 0; i < start->edges.size(); i++) {
+    node* n1 = start->edges[i]->end;
+    bool found = false;
+    for (int j=0; j < path.size(); j++) {
+      if (path[j] == n1) {
+	found = true;
+      }
+    }
+    if (found == false) {
+      int k = start->edges[i]->weight + find_path(n1,end,nodes,path);
+      if (k < minimum) {
+	minimum = k;
+      }
+    }
+  }
+  return minimum;
 }
